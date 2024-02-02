@@ -1,14 +1,35 @@
 "use client"
 
 import { PRODUCT_CATEGORIES } from "@/config"
+import { useOnClickOutside } from "@/hooks/use-on-click-outside"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const MobileNav = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("keydown", handler)
+
+    return () => {
+      document.removeEventListener("keydown", handler)
+    }
+  }, [])
+
+  const isAnyOpen = isOpen !== false
+
+  const navRef = useRef<HTMLDivElement | null>(null)
+
+  useOnClickOutside(navRef, () => setIsOpen(false))
 
   const pathname = usePathname()
 
@@ -50,7 +71,10 @@ const MobileNav = () => {
 
       <div className="fixed overflow-y-scroll overscroll-y-none inset-0 z-40 flex">
         <div className="w-4/5">
-          <div className="relative flex w-full max-w-sm flex-col overflow-y-auto bg-white pb-12 shadow-xl">
+          <div
+            className="relative flex w-full max-w-sm flex-col overflow-y-auto bg-white pb-12 shadow-xl"
+            ref={navRef}
+          >
             <div className="flex px-4 pb-2 pt-5">
               <button
                 type="button"
